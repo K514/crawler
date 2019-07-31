@@ -1,12 +1,18 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class UIViewManager : MonoBehaviour
 {
     #region <Consts>
 
+    private const string DefaultHeader = "https://www.nicovideo.jp";
+    private const string DefaultParsing = "\"";
+    private const string DefaultKeyword = "/watch/sm";
+    
     /// <summary>
     /// Singleton
     /// </summary>
@@ -17,6 +23,11 @@ public class UIViewManager : MonoBehaviour
     #region <Fields>
 
     /// <summary>
+    /// Header Input UI
+    /// </summary>
+    private InputField _AddHeaderInputField;
+    
+    /// <summary>
     /// Url Input UI
     /// </summary>
     private InputField _KeywordInputField;
@@ -25,6 +36,11 @@ public class UIViewManager : MonoBehaviour
     /// Url Input UI
     /// </summary>
     private InputField _UrlInputField;
+        
+    /// <summary>
+    /// Url Input UI
+    /// </summary>
+    private InputField _ExportInputField;
     
     /// <summary>
     /// Url Input UI
@@ -59,10 +75,12 @@ public class UIViewManager : MonoBehaviour
         }
 
         // Find UI
+        _AddHeaderInputField = transform.Find("AdditiveHeader").GetComponent<InputField>();
         _KeywordInputField = transform.Find("KeyWord").GetComponent<InputField>();
         _UrlInputField = transform.Find("Url").GetComponent<InputField>();
         _ParsingSymbolField = transform.Find("ParsingTerminateSymbol").GetComponent<InputField>();
         _Response = transform.Find("Image/Response").GetComponent<Text>();
+        _ExportInputField = transform.Find("ExportTo").GetComponent<InputField>();
         
         // Pop Logic Manager
         _LogicManager = gameObject.AddComponent<UILogicManager>();
@@ -88,17 +106,26 @@ public class UIViewManager : MonoBehaviour
     /// </summary>
     private void BindEventHandler()
     {
-        var KeywordHandler =  new InputField.SubmitEvent(); 
-        KeywordHandler.AddListener(_LogicManager.OnEndInputKeyword);
-        _KeywordInputField.onEndEdit = KeywordHandler;
-        
-        var UrlHandler =  new InputField.SubmitEvent(); 
-        UrlHandler.AddListener(_LogicManager.OnEndInputUrl);
-        _UrlInputField.onEndEdit = UrlHandler;
-        
-        var ParsingHandler =  new InputField.SubmitEvent(); 
-        ParsingHandler.AddListener(_LogicManager.OnEndInputParsingTerminateSymbol);
-        _ParsingSymbolField.onEndEdit = ParsingHandler;
+        SetHandler_And_InitDefaultString(_AddHeaderInputField, _LogicManager.OnEndInputHeader, DefaultHeader);
+        SetHandler_And_InitDefaultString(_KeywordInputField, _LogicManager.OnEndInputKeyword, DefaultKeyword);
+        SetHandler_And_InitDefaultString(_ParsingSymbolField, _LogicManager.OnEndInputParsingTerminateSymbol, DefaultParsing);
+        SetHandler_And_InitDefaultString(_UrlInputField, _LogicManager.OnEndInputUrl);
+        _ExportInputField.text = UILogicManager.ExportDirectory;
+    }
+
+    /// <summary>
+    /// Set Action and Default value to specify InputField
+    /// </summary>
+    private void SetHandler_And_InitDefaultString(InputField p_InputField, UnityAction<string> p_BindingAction, string p_DefautString = null)
+    {
+        var handlerWrapper =  new InputField.SubmitEvent(); 
+        handlerWrapper.AddListener(p_BindingAction);
+        p_InputField.onEndEdit = handlerWrapper;
+        if (p_DefautString != null)
+        {
+            p_InputField.text = p_DefautString;
+            p_InputField.onEndEdit.Invoke(p_InputField.text);
+        }
     }
 
     /// <summary>

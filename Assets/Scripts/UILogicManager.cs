@@ -1,16 +1,25 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
 public class UILogicManager : MonoBehaviour
 {
+    #region <Consts>
+
+    private const string ExportFormatPref = "ExportFormatPref";
+    public static string ExportDirectory;
+    
+    #endregion
+    
     #region <Fields>
 
     private string _TargetUrl;
     private string _TargetKeyword;
+    private string _TargetHeader;
     private char _ParsingTerminateSymbol;
     private string _doc;
     private string _result;
@@ -24,7 +33,7 @@ public class UILogicManager : MonoBehaviour
 
     private enum Phase
     {
-        None, DownloadWebDoc, ParsingWebDoc
+        None, DownloadWebDoc, ParsingWebDoc, ExportToText
     }
 
     #endregion
@@ -33,11 +42,21 @@ public class UILogicManager : MonoBehaviour
 
     private void Awake()
     {
+        ExportDirectory = Application.persistentDataPath + "/Export";
         _TaskQueue = new List<Action>();
         _TaskQueue.Add(() => { StartCoroutine(DownloadWebDoc()); });
         _TaskQueue.Add(() => { StartCoroutine(ParseWebDoc()); });
+        _TaskQueue.Add(() => { StartCoroutine(ExporToText()); });
+        _TaskQueue.Add(() => { Initialize(); });
     }
 
+    public void OnEndInputHeader(string p_Header)
+    {
+        if (_CurrentPhase != Phase.None) return;
+        _TargetHeader = p_Header;
+        UIViewManager.Instance.SetResponseMessage($"Header set . . . [{ _TargetHeader }]");
+    }
+    
     public void OnEndInputKeyword(string p_Keyword)
     {
         if (_CurrentPhase != Phase.None) return;
@@ -113,14 +132,40 @@ public class UILogicManager : MonoBehaviour
             for (var i = 0; i < deadLine; i++)
             {
                 var iterateTargetChar = parsingLine[i];
-                stringAppend.Append(iterateTargetChar);
                 if (iterateTargetChar == _ParsingTerminateSymbol) break;
+                stringAppend.Append(iterateTargetChar);
             }
-            _result += $"{stringAppend}\n";
+            _result += $"{_TargetHeader + stringAppend}\n";
         }
         
-        Debug.Log(_result);
+        EntryNextTask();
     }
 
+    private IEnumerator ExporToText()
+    {
+        yield return null;
+        _CurrentPhase = Phase.ExportToText;
+        UIViewManager.Instance.SetResponseMessage($"Exporting . . .");
+
+        var exportId = PlayerPrefs.GetInt(ExportFormatPref) + 1;
+        PlayerPrefs.SetInt(ExportFormatPref, exportId);
+        PlayerPrefs.Save();
+
+        if(!Directory.Exists(ExportDirectory))
+        {
+            Directory.CreateDirectory(ExportDirectory);
+        }
+        
+        using (FileStream fileStream = File.Create(ExportDirectory + $"/{exportId}.txt"))
+        {
+            Byte[] serializedResult = new UTF8Encoding(true).GetBytes(_result);
+            fileStream.Write(serializedResult, 0, serializedResult.Length);
+        }
+        
+        UIViewManager.Instance.SetResponseMessage($"Complete ! ! !");
+        EntryNextTask();
+    }
+
+    
     #endregion
 }
