@@ -53,10 +53,18 @@ public class UIViewManager : MonoBehaviour
         _Response = transform.Find("Image/Response").GetComponent<Text>();
         
         // Pop Logic Manager
-        _LogicManager = new UILogicManager();
+        _LogicManager = gameObject.AddComponent<UILogicManager>();
 
         // Bind EventHandler
         BindEventHandler();
+    }
+
+    /// <summary>
+    /// Initialize View Manage State when new task begin
+    /// </summary>
+    public void OnNewTaskOccured()
+    {
+        ClearResponseMessage();
     }
 
     #endregion
@@ -79,7 +87,15 @@ public class UIViewManager : MonoBehaviour
     /// <param name="p_Message"></param>
     public void SetResponseMessage(string p_Message)
     {
-        _Response.text = p_Message;
+        _Response.text += $"{p_Message}\n" ;
+    }
+
+    /// <summary>
+    /// Clear Response Message
+    /// </summary>
+    public void ClearResponseMessage()
+    {
+        _Response.text = null;
     }
 
     #endregion
