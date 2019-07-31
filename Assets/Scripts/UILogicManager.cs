@@ -26,6 +26,7 @@ public class UILogicManager : MonoBehaviour
     private List<Action> _TaskQueue;
     private int _TaskQueueIndex;
     private Phase _CurrentPhase;
+    private ActType _ActType;
     
     #endregion
 
@@ -33,7 +34,12 @@ public class UILogicManager : MonoBehaviour
 
     private enum Phase
     {
-        None, DownloadWebDoc, ParsingWebDoc, ExportToText
+        None, DownloadWebDoc, ParsingWebDoc, ExtraParsingByActType, ExportToText
+    }
+
+    private enum ActType
+    {
+        None, NicoNicoDouge
     }
 
     #endregion
@@ -46,6 +52,7 @@ public class UILogicManager : MonoBehaviour
         _TaskQueue = new List<Action>();
         _TaskQueue.Add(() => { StartCoroutine(DownloadWebDoc()); });
         _TaskQueue.Add(() => { StartCoroutine(ParseWebDoc()); });
+        _TaskQueue.Add(() => { StartCoroutine(ExtraParsingByActType()); });
         _TaskQueue.Add(() => { StartCoroutine(ExporToText()); });
         _TaskQueue.Add(() => { Initialize(); });
     }
@@ -79,7 +86,20 @@ public class UILogicManager : MonoBehaviour
         _ParsingTerminateSymbol = p_Symbol[0];
         UIViewManager.Instance.SetResponseMessage($"Parsing Terminate Symbol set . . . [{ _ParsingTerminateSymbol }]");
     }
-    
+
+    public void OnNicoNicoToggleSwitched(bool p_Flag)
+    {
+        if (_ActType == ActType.NicoNicoDouge && !p_Flag)
+        {
+            _ActType = ActType.None;
+        }
+
+        if (_ActType != ActType.NicoNicoDouge && p_Flag)
+        {
+            _ActType = ActType.NicoNicoDouge;
+        }
+    }
+
     #endregion
 
     #region <Methods>
@@ -141,6 +161,25 @@ public class UILogicManager : MonoBehaviour
         EntryNextTask();
     }
 
+    private IEnumerator ExtraParsingByActType()
+    {
+        yield return null;
+        _CurrentPhase = Phase.ExtraParsingByActType;
+        UIViewManager.Instance.SetResponseMessage($"Acting . . .  [{ _CurrentPhase }]");
+
+        switch (_ActType)
+        {
+            case ActType.None :
+                break;
+            case ActType.NicoNicoDouge :
+                ActTypeNicoNico.GetInstance.FormatToNicoNicoUrl(_result);
+                _result = ActTypeNicoNico.GetInstance.GetFormattedString();
+                break;
+        }
+        
+        EntryNextTask();
+    }
+    
     private IEnumerator ExporToText()
     {
         yield return null;

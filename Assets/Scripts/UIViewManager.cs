@@ -28,7 +28,7 @@ public class UIViewManager : MonoBehaviour
     private InputField _AddHeaderInputField;
     
     /// <summary>
-    /// Url Input UI
+    /// Keyword Input UI
     /// </summary>
     private InputField _KeywordInputField;
     
@@ -38,12 +38,12 @@ public class UIViewManager : MonoBehaviour
     private InputField _UrlInputField;
         
     /// <summary>
-    /// Url Input UI
+    /// ExportDirectory Display UI
     /// </summary>
     private InputField _ExportInputField;
     
     /// <summary>
-    /// Url Input UI
+    /// Parsing Symbol Input UI
     /// </summary>
     private InputField _ParsingSymbolField;
 
@@ -51,6 +51,11 @@ public class UIViewManager : MonoBehaviour
     /// Response Message display here
     /// </summary>
     private Text _Response;
+
+    /// <summary>
+    /// When Parsing NicoNico Webdoc
+    /// </summary>
+    private Toggle _WhenNicoNico;
     
     /// <summary>
     /// Logic Manager
@@ -81,6 +86,7 @@ public class UIViewManager : MonoBehaviour
         _ParsingSymbolField = transform.Find("ParsingTerminateSymbol").GetComponent<InputField>();
         _Response = transform.Find("Image/Response").GetComponent<Text>();
         _ExportInputField = transform.Find("ExportTo").GetComponent<InputField>();
+        _WhenNicoNico = transform.Find("IsNico").GetComponent<Toggle>();
         
         // Pop Logic Manager
         _LogicManager = gameObject.AddComponent<UILogicManager>();
@@ -110,6 +116,11 @@ public class UIViewManager : MonoBehaviour
         SetHandler_And_InitDefaultString(_KeywordInputField, _LogicManager.OnEndInputKeyword, DefaultKeyword);
         SetHandler_And_InitDefaultString(_ParsingSymbolField, _LogicManager.OnEndInputParsingTerminateSymbol, DefaultParsing);
         SetHandler_And_InitDefaultString(_UrlInputField, _LogicManager.OnEndInputUrl);
+
+        var handlerWrapper = new Toggle.ToggleEvent();
+        handlerWrapper.AddListener(_LogicManager.OnNicoNicoToggleSwitched);
+        _WhenNicoNico.onValueChanged = handlerWrapper;
+        
         _ExportInputField.text = UILogicManager.ExportDirectory;
     }
 
