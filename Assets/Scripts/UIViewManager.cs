@@ -19,8 +19,18 @@ public class UIViewManager : MonoBehaviour
     /// <summary>
     /// Url Input UI
     /// </summary>
-    private InputField _InputField;
+    private InputField _KeywordInputField;
     
+    /// <summary>
+    /// Url Input UI
+    /// </summary>
+    private InputField _UrlInputField;
+    
+    /// <summary>
+    /// Url Input UI
+    /// </summary>
+    private InputField _ParsingSymbolField;
+
     /// <summary>
     /// Response Message display here
     /// </summary>
@@ -49,7 +59,9 @@ public class UIViewManager : MonoBehaviour
         }
 
         // Find UI
-        _InputField = transform.Find("Input").GetComponent<InputField>();
+        _KeywordInputField = transform.Find("KeyWord").GetComponent<InputField>();
+        _UrlInputField = transform.Find("Url").GetComponent<InputField>();
+        _ParsingSymbolField = transform.Find("ParsingTerminateSymbol").GetComponent<InputField>();
         _Response = transform.Find("Image/Response").GetComponent<Text>();
         
         // Pop Logic Manager
@@ -76,9 +88,17 @@ public class UIViewManager : MonoBehaviour
     /// </summary>
     private void BindEventHandler()
     {
-        var handler =  new InputField.SubmitEvent(); 
-        handler.AddListener(_LogicManager.OnEndInputUrl);
-        _InputField.onEndEdit = handler;
+        var KeywordHandler =  new InputField.SubmitEvent(); 
+        KeywordHandler.AddListener(_LogicManager.OnEndInputKeyword);
+        _KeywordInputField.onEndEdit = KeywordHandler;
+        
+        var UrlHandler =  new InputField.SubmitEvent(); 
+        UrlHandler.AddListener(_LogicManager.OnEndInputUrl);
+        _UrlInputField.onEndEdit = UrlHandler;
+        
+        var ParsingHandler =  new InputField.SubmitEvent(); 
+        ParsingHandler.AddListener(_LogicManager.OnEndInputParsingTerminateSymbol);
+        _ParsingSymbolField.onEndEdit = ParsingHandler;
     }
 
     /// <summary>
