@@ -107,6 +107,7 @@ public class UILogicManager : MonoBehaviour
     private void Initialize()
     {
         _TaskQueueIndex = 0;
+        _result = "";
         _CurrentPhase = Phase.None;
     }
 
