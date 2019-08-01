@@ -48,7 +48,7 @@ public class UILogicManager : MonoBehaviour
 
     private void Awake()
     {
-        ExportDirectory = Application.persistentDataPath + "/Export";
+        ExportDirectory = Application.dataPath + "/../Export";
         _TaskQueue = new List<Action>();
         _TaskQueue.Add(() => { StartCoroutine(DownloadWebDoc()); });
         _TaskQueue.Add(() => { StartCoroutine(ParseWebDoc()); });
