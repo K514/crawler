@@ -51,6 +51,7 @@ public class ActTypeNicoNico
     /// <param name="p_Text"></param>
     public void FormatToNicoNicoUrl(string p_Text)
     {
+        _VideoIdCollection.Clear();
         var partialTextGroup = p_Text.Split(new string[]{ "sm" }, StringSplitOptions.None);
         foreach (var partialTextLine in partialTextGroup)
         {
