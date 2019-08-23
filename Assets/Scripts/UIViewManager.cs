@@ -60,7 +60,7 @@ public class UIViewManager : MonoBehaviour
     /// <summary>
     /// Logic Manager
     /// </summary>
-    private UILogicManager _LogicManager;
+    [NonSerialized] public UILogicManager _LogicManager;
     
     #endregion
 

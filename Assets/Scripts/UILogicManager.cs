@@ -201,11 +201,12 @@ public class UILogicManager : MonoBehaviour
             Byte[] serializedResult = new UTF8Encoding(true).GetBytes(_result);
             fileStream.Write(serializedResult, 0, serializedResult.Length);
         }
-        
+        ReadDB.UpdateDB();
         UIViewManager.Instance.SetResponseMessage($"Complete ! ! !");
         EntryNextTask();
     }
 
-    
+    public string GetExportFileName() => ExportDirectory;
+
     #endregion
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public class ActTypeNicoNico
@@ -15,9 +16,13 @@ public class ActTypeNicoNico
     /// <summary>
     /// NicoNico URL format Header
     /// </summary>
-    public const string NicoNicoUrlHeader = "https://www.nicovideo.jp/watch/sm"; 
+    public const string NicoNicoUrlHeader = "https://www.nicovideo.jp/watch/sm";
+    public const string NicoNicoUrlRegix = "^" + NicoNicoUrlHeader + "[0-9]{0,9}$";
     public static ActTypeNicoNico GetInstance { get; }
+    public static Regex _niconicoUrlRegex;
 
+    public static bool IsNicoNicoVidUrl(string p_Url) => _niconicoUrlRegex.IsMatch(p_Url);
+    
     #endregion
 
     #region <Fields>
@@ -27,6 +32,7 @@ public class ActTypeNicoNico
     /// </summary>
     private Dictionary<int, string> _VideoIdCollection;
 
+    
     #endregion
 
     #region <Constructors>
@@ -34,6 +40,7 @@ public class ActTypeNicoNico
     static ActTypeNicoNico ()
     {
         GetInstance = new ActTypeNicoNico();
+        _niconicoUrlRegex = new Regex(@NicoNicoUrlRegix);        
     }
 
     private ActTypeNicoNico()
@@ -59,9 +66,17 @@ public class ActTypeNicoNico
             try
             {
                 var parsedId = int.Parse(partialTextLine.Substring(0, IdLength));
-                if (!_VideoIdCollection.ContainsKey(parsedId))
+                var vidUrl = NicoNicoUrlHeader + parsedId;
+                if (IsNicoNicoVidUrl(vidUrl))
                 {
-                    _VideoIdCollection.Add(parsedId, NicoNicoUrlHeader + parsedId + '\n');
+                    if (!ReadDB.cachedVideoUrlGroup.Contains(vidUrl))
+                    {
+                        ReadDB.cachedVideoUrlGroup.Add(vidUrl);
+                        if (!_VideoIdCollection.ContainsKey(parsedId))
+                        {
+                            _VideoIdCollection.Add(parsedId, vidUrl + '\n');
+                        }
+                    }
                 }
             }
             catch (Exception e)
