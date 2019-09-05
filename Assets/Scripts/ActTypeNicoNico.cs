@@ -9,15 +9,10 @@ public class ActTypeNicoNico
     #region <Consts>
 
     /// <summary>
-    /// NicoNico ID Format = smXXXXXXXX
-    /// </summary>
-    public const int IdLength = 8;
-
-    /// <summary>
     /// NicoNico URL format Header
     /// </summary>
-    public const string NicoNicoUrlHeader = "https://www.nicovideo.jp/watch/sm";
-    public const string NicoNicoUrlRegix = "^" + NicoNicoUrlHeader + "[0-9]{0,9}$";
+    public const string NicoNicoUrlHeader = "https://www.nicovideo.jp/watch/";
+    public const string NicoNicoUrlRegix = "^" + NicoNicoUrlHeader + "(sm|nm)[0-9]{0,9}$";
     public static ActTypeNicoNico GetInstance { get; }
     public static Regex _niconicoUrlRegex;
 
@@ -55,26 +50,33 @@ public class ActTypeNicoNico
     /// <summary>
     /// Extract ID from Text and form NicoNico format URL
     /// </summary>
-    /// <param name="p_Text"></param>
     public void FormatToNicoNicoUrl(string p_Text)
     {
+        Debug.Log(p_Text);
+        
+        var tryCount = 0;
+        var successCount = 0;
         _VideoIdCollection.Clear();
-        var partialTextGroup = p_Text.Split(new string[]{ "sm" }, StringSplitOptions.None);
+        var partialTextGroup = p_Text.Split(new string[]{ NicoNicoUrlHeader }, StringSplitOptions.None);
         foreach (var partialTextLine in partialTextGroup)
         {
-            Debug.Log(partialTextLine);
             try
             {
-                var parsedId = int.Parse(partialTextLine.Substring(0, IdLength));
-                var vidUrl = NicoNicoUrlHeader + parsedId;
+                Debug.Log("pasredText : " + partialTextLine);
+                var vidUrl = NicoNicoUrlHeader + partialTextLine;
+                tryCount++;
                 if (IsNicoNicoVidUrl(vidUrl))
                 {
+                    vidUrl = vidUrl.Substring(0, vidUrl.Length - 1);
                     if (!ReadDB.cachedVideoUrlGroup.Contains(vidUrl))
                     {
                         ReadDB.cachedVideoUrlGroup.Add(vidUrl);
+                        var parsedId = Convert.ToInt32(vidUrl.Split('m')[1]);
+                        Debug.Log(parsedId);
                         if (!_VideoIdCollection.ContainsKey(parsedId))
                         {
-                            _VideoIdCollection.Add(parsedId, vidUrl + '\n');
+                            successCount++;
+                            _VideoIdCollection.Add(parsedId, vidUrl + "\n");
                         }
                     }
                 }
@@ -84,6 +86,8 @@ public class ActTypeNicoNico
                 // do sth
             }
         }
+        
+        Debug.Log($"{tryCount} / {successCount}");
     }
 
     /// <summary>

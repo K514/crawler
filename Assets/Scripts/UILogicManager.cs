@@ -142,24 +142,93 @@ public class UILogicManager : MonoBehaviour
     {
         yield return null;
         _CurrentPhase = Phase.ParsingWebDoc;
-        UIViewManager.Instance.SetResponseMessage($"Parcing . . .  start from [{ _TargetKeyword }] to [{ _ParsingTerminateSymbol }]");
-        var stringAppend = new StringBuilder();
-        var partialDoc = _doc.Split(new string[]{_TargetKeyword}, StringSplitOptions.None);
-        foreach (var parsingLine in partialDoc)
+
+        switch (_ActType)
         {
-            stringAppend.Clear();
-            stringAppend.Append(_TargetKeyword);
-            var deadLine = parsingLine.Length;
-            for (var i = 0; i < deadLine; i++)
+            case ActType.NicoNicoDouge:
             {
-                var iterateTargetChar = parsingLine[i];
-                if (iterateTargetChar == _ParsingTerminateSymbol) break;
-                stringAppend.Append(iterateTargetChar);
+                UIViewManager.Instance.SetResponseMessage($"Parsing . . .  start from [{ _TargetKeyword }] to [{ _ParsingTerminateSymbol }]");
+                var stringAppend = new StringBuilder();
+                var partialDoc = _doc.Split(new string[]{_TargetKeyword}, StringSplitOptions.None);
+                foreach (var parsingLine in partialDoc)
+                {
+                    stringAppend.Clear();
+                    stringAppend.Append(_TargetKeyword);
+                    var deadLine = parsingLine.Length;
+                    for (var i = 0; i < deadLine; i++)
+                    {
+                        var iterateTargetChar = parsingLine[i];
+                        if (iterateTargetChar == _ParsingTerminateSymbol) break;
+                        stringAppend.Append(iterateTargetChar);
+                    }
+                    _result += $"{_TargetHeader + stringAppend}\n";
+                }
+                
+                _TargetKeyword = "watch/sm";
+                
+                UIViewManager.Instance.SetResponseMessage($"Parsing . . .  start from [{ _TargetKeyword }] to [{ _ParsingTerminateSymbol }]");
+                stringAppend = new StringBuilder();
+                partialDoc = _doc.Split(new string[]{_TargetKeyword}, StringSplitOptions.None);
+                foreach (var parsingLine in partialDoc)
+                {
+                    stringAppend.Clear();
+                    stringAppend.Append(_TargetKeyword);
+                    var deadLine = parsingLine.Length;
+                    for (var i = 0; i < deadLine; i++)
+                    {
+                        var iterateTargetChar = parsingLine[i];
+                        if (iterateTargetChar == _ParsingTerminateSymbol) break;
+                        stringAppend.Append(iterateTargetChar);
+                    }
+                    _result += $"{_TargetHeader + stringAppend}\n";
+                }
+                        
+                _TargetKeyword = "watch/nm";
+                
+                UIViewManager.Instance.SetResponseMessage($"Parsing . . .  start from [{ _TargetKeyword }] to [{ _ParsingTerminateSymbol }]");
+                stringAppend = new StringBuilder();
+                partialDoc = _doc.Split(new string[]{_TargetKeyword}, StringSplitOptions.None);
+                foreach (var parsingLine in partialDoc)
+                {
+                    stringAppend.Clear();
+                    stringAppend.Append(_TargetKeyword);
+                    var deadLine = parsingLine.Length;
+                    for (var i = 0; i < deadLine; i++)
+                    {
+                        var iterateTargetChar = parsingLine[i];
+                        if (iterateTargetChar == _ParsingTerminateSymbol) break;
+                        stringAppend.Append(iterateTargetChar);
+                    }
+                    _result += $"{_TargetHeader + stringAppend}\n";
+                }
+                EntryNextTask();
+                
+                break;
             }
-            _result += $"{_TargetHeader + stringAppend}\n";
-        }
+
+            default:
+            {
+                UIViewManager.Instance.SetResponseMessage($"Parsing . . .  start from [{ _TargetKeyword }] to [{ _ParsingTerminateSymbol }]");
+                var stringAppend = new StringBuilder();
+                var partialDoc = _doc.Split(new string[]{_TargetKeyword}, StringSplitOptions.None);
+                foreach (var parsingLine in partialDoc)
+                {
+                    stringAppend.Clear();
+                    stringAppend.Append(_TargetKeyword);
+                    var deadLine = parsingLine.Length;
+                    for (var i = 0; i < deadLine; i++)
+                    {
+                        var iterateTargetChar = parsingLine[i];
+                        if (iterateTargetChar == _ParsingTerminateSymbol) break;
+                        stringAppend.Append(iterateTargetChar);
+                    }
+                    _result += $"{_TargetHeader + stringAppend}\n";
+                }
         
-        EntryNextTask();
+                EntryNextTask();
+                break;
+            }
+        }
     }
 
     private IEnumerator ExtraParsingByActType()

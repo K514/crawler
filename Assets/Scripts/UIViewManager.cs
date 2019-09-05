@@ -9,9 +9,9 @@ public class UIViewManager : MonoBehaviour
 {
     #region <Consts>
 
-    private const string DefaultHeader = "https://www.nicovideo.jp";
+    private const string DefaultHeader = "https://www.nicovideo.jp/";
     private const string DefaultParsing = "\"";
-    private const string DefaultKeyword = "/watch/sm";
+    private const string DefaultKeyword = "";
     
     /// <summary>
     /// Singleton
@@ -122,6 +122,7 @@ public class UIViewManager : MonoBehaviour
         _WhenNicoNico.onValueChanged = handlerWrapper;
         
         _ExportInputField.text = UILogicManager.ExportDirectory;
+        _WhenNicoNico.isOn = true;
     }
 
     /// <summary>
